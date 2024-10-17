@@ -65,7 +65,7 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           aqtversion: "==3.1.*"
-          version: "6.5.2"
+          version: "6.8.0"
           arch: ${{ matrix.arch }}
           modules: qtwebengine qtpositioning qtwebchannel qtnetworkauth qtserialport
           cache: "true"
@@ -101,7 +101,7 @@ jobs:
       - name: Package Quasar
         if: runner.os == 'Linux'
         run: |
-          export QUASAR_VERSION="0.6.9"
+          export QUASAR_VERSION="0.7.0"
           export RELEASE_PACKAGE_FILE="quasar-linux-v$QUASAR_VERSION.zip"
           7z a $RELEASE_PACKAGE_FILE ./build/*
           echo "RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)" >> $GITHUB_ENV
@@ -121,17 +121,3 @@ jobs:
           path: ${{ env.RELEASE_PACKAGE_PATH }}
           if-no-files-found: error
           retention-days: 1
-
-      - name: Upload Release Asset
-        if: runner.os == 'Linux'
-        uses: shogo82148/actions-upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.RELEASE_PACKAGE_PATH }}
-
-      - name: Upload Sample Widgets
-        if: runner.os == 'Linux'
-        uses: shogo82148/actions-upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.WIDGETS_PACKAGE_FILE }}
