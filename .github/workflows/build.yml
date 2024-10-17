@@ -103,7 +103,7 @@ jobs:
         run: |
           export QUASAR_VERSION="0.6.9"
           export RELEASE_PACKAGE_FILE="quasar-linux-v$QUASAR_VERSION.zip"
-          7z a $RELEASE_PACKAGE_FILE ./build/quasar/Release/*
+          7z a $RELEASE_PACKAGE_FILE ./build/*
           export RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)
           
       - name: Package Sample Widgets
