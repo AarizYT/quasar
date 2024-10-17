@@ -101,17 +101,17 @@ jobs:
       - name: Package Quasar
         if: runner.os == 'Linux'
         run: |
-          QUASAR_VERSION = "0.6.9"
-          RELEASE_PACKAGE_FILE = "quasar-linux-v$QUASAR_VERSION.zip"
+          export QUASAR_VERSION = "0.6.9"
+          export RELEASE_PACKAGE_FILE = "quasar-linux-v$QUASAR_VERSION.zip"
           7z a $RELEASE_PACKAGE_FILE ./build/quasar/Release/*
-          RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)
+          export RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)
           
       - name: Package Sample Widgets
         if: runner.os == 'Linux'
         run: |
-          WIDGETS_PACKAGE_FILE = "quasar-sample-widgets.zip"
+          export WIDGETS_PACKAGE_FILE = "quasar-sample-widgets.zip"
           7z a $WIDGETS_PACKAGE_FILE ./widgets/
-          WIDGETS_PACKAGE_FILE=$(realpath $WIDGETS_PACKAGE_FILE)
+          export WIDGETS_PACKAGE_FILE=$(realpath $WIDGETS_PACKAGE_FILE)
 
       - name: Upload Build Artifact
         if: runner.os == 'Linux'
