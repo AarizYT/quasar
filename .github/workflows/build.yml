@@ -104,17 +104,14 @@ jobs:
           export QUASAR_VERSION="0.6.9"
           export RELEASE_PACKAGE_FILE="quasar-linux-v$QUASAR_VERSION.zip"
           7z a $RELEASE_PACKAGE_FILE ./build/*
-          export RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)
-          echo "The env variable is $GITHUB_ENV"
-          echo $RELEASE_PACKAGE_PATH >> $GITHUB_ENV
+          echo "RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)" >> $GITHUB_ENV
           
       - name: Package Sample Widgets
         if: runner.os == 'Linux'
         run: |
           export WIDGETS_PACKAGE_FILE="quasar-sample-widgets.zip"
-          7z a $WIDGETS_PACKAGE_FILE ./widgets/
-          export WIDGETS_PACKAGE_FILE=$(realpath $WIDGETS_PACKAGE_FILE)
-          echo $WIDGETS_PACKAGE_FILE >> $GITHUB_ENV
+          7z a $WIDGETS_PACKAGE_FILE ./widgets/ 
+          echo "WIDGETS_PACKAGE_FILE=$(realpath $WIDGETS_PACKAGE_FILE)" >> $GITHUB_ENV
 
       - name: Upload Build Artifact
         if: runner.os == 'Linux'
