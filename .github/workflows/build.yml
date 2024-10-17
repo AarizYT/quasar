@@ -35,15 +35,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        builder: [windows-clang, ubuntu-gcc, ubuntu-clang]
+        builder: [ubuntu-gcc, ubuntu-clang]
         include:
-          - builder: windows-clang
-            os: windows-latest
-            arch: "win64_msvc2019_64"
-            cc: clang-cl.exe
-            cxx: clang-cl.exe
-            g: '-G "Ninja Multi-Config"'
-            packages: ninja
           - builder: ubuntu-gcc
             os: ubuntu-latest
             arch: "gcc_64"
@@ -83,19 +76,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.packages }}
 
-      - name: Set up Packages (Windows)
-        if: runner.os == 'Windows'
-        run: choco install ${{ matrix.packages }}
-
       - name: Set up Clang
-        if: matrix.builder == 'ubuntu-clang' || matrix.builder == 'windows-clang'
+        if: matrix.builder == 'ubuntu-clang'
         uses: egor-tensin/setup-clang@v1
         with:
           version: 16
 
-      - name: Setup MSVC Environment (Windows)
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Cache vcpkg
         uses: lukka/run-vcpkg@v10
@@ -113,42 +99,38 @@ jobs:
         run: cmake --build ./build --config Release --target all --
 
       - name: Package Quasar
-        if: runner.os == 'Windows'
-        shell: powershell
+        if: runner.os == 'Linux'
         run: |
-          $QUASAR_VERSION = (Select-String -Path ./quasar/CMakeLists.txt -Pattern 'project\(quasar VERSION ([0-9\.]+)\)') | %{$_.Matches.Groups[1].value}
-          $RELEASE_PACKAGE_FILE = "quasar-windows-v$QUASAR_VERSION.zip"
+          QUASAR_VERSION = "0.6.9"
+          RELEASE_PACKAGE_FILE = "quasar-linux-v$QUASAR_VERSION.zip"
           7z a $RELEASE_PACKAGE_FILE ./build/quasar/Release/*
-          $release_filepath = Get-ChildItem $RELEASE_PACKAGE_FILE | %{$_[0].FullName}
-          echo "RELEASE_PACKAGE_PATH=$release_filepath" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-
+          RELEASE_PACKAGE_PATH=$(realpath $RELEASE_PACKAGE_FILE)
+          
       - name: Package Sample Widgets
-        if: runner.os == 'Windows' && github.event_name == 'release'
-        shell: powershell
+        if: runner.os == 'Linux'
         run: |
-          $WIDGETS_PACKAGE_FILE = "quasar-sample-widgets.zip"
+          WIDGETS_PACKAGE_FILE = "quasar-sample-widgets.zip"
           7z a $WIDGETS_PACKAGE_FILE ./widgets/
-          $widgets_filepath = Get-ChildItem $WIDGETS_PACKAGE_FILE | %{$_[0].FullName}
-          echo "WIDGETS_PACKAGE_FILE=$widgets_filepath" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+          WIDGETS_PACKAGE_FILE=$(realpath $WIDGETS_PACKAGE_FILE)
 
       - name: Upload Build Artifact
-        if: runner.os == 'Windows'
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
-          name: quasar-windows-Release
+          name: quasar-linux-Release
           path: ${{ env.RELEASE_PACKAGE_PATH }}
           if-no-files-found: error
           retention-days: 1
 
       - name: Upload Release Asset
-        if: runner.os == 'Windows' && github.event_name == 'release'
+        if: runner.os == 'Linux'
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ env.RELEASE_PACKAGE_PATH }}
 
       - name: Upload Sample Widgets
-        if: runner.os == 'Windows' && github.event_name == 'release'
+        if: runner.os == 'Linux'
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
